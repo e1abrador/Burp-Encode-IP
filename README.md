@@ -34,10 +34,6 @@ When viewing the result on Cyber Chef (https://gchq.github.io/CyberChef/) and se
 
 ![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/be513038-ca00-41cb-aa8c-1a150eee0d85)
 
-## TODO
-
-- Maybe consider adding more encodings.
-
 Good luck and good hunting!
 If you really love the tool (or any others), or they helped you find an awesome bounty, consider [BUYING ME A COFFEE!](https://www.buymeacoffee.com/e1abrador) ☕ (I could use the caffeine!)
 
