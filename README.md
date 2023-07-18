@@ -2,7 +2,7 @@
 
 This extension will encode an IP address first to Unicode and then to URL encoding. The extension needs to URL encode the IP address since Burp Suite doesn't accept Unicode on the request boxes.
 
-This technique is focused on testing how the server normalizes Unicode characters (where an IP address is needed, such as SSRF [Server-Side Request Forgery], Open Redirect or RFI [Remote File Inclusion].
+This technique is focused on testing how the server normalizes Unicode characters (where an IP address is needed), such as SSRF [Server-Side Request Forgery], Open Redirect or RFI [Remote File Inclusion].
 
 ## TL;DR
 
