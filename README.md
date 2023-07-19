@@ -22,7 +22,7 @@ First, select the IP address you want to encode:
 
 ![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/caa4da8c-89a1-4d39-a0e8-db1c5ee91651)
 
-Then right click <b>-></b> Extensions <b>-></b> <choose any encoding>
+Then right click <b>-></b> Extensions <b>-></b> \<choose any encoding\>
 
 ![image](https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/04b052e1-15b9-4876-9830-0ccc45eaa457)
 
