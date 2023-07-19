@@ -8,7 +8,7 @@ This technique is focused on testing how the server normalizes Unicode character
 
 ### Installation
 
-Go to the Extensions <b>-></b> Installed <b>-></b> Add <b>-></b> burp-unicode-ip.py
+Go to the Extensions <b>-></b> Installed <b>-></b> Add <b>-></b> burp-encode-ip.py
 
 ## Using
 
