@@ -38,6 +38,8 @@ When viewing the result on Cyber Chef (https://gchq.github.io/CyberChef/) and se
 
 <b>Unicode Encoding:</b> This method encodes the IP address into a Unicode string.
 
+<b>IPv4 on IPv6 Encoding</b>
+
 <b>Class B Encoding:</b> In this method, the IP address is divided into two parts: the first two octets are preserved as is and the last two are combined into a single value.
 
 <b>Class A Encoding:</b> This method preserves the first octet as is and combines the remaining three octets into a single value.
