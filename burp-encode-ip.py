@@ -21,19 +21,47 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
     def createMenuItems(self, invocation):
         self.context = invocation
         menu_list = ArrayList()
-        menu_list.add(JMenuItem("Unicode Encoding", actionPerformed=self.encode_ip))
-        menu_list.add(JMenuItem("Class B Encoding", actionPerformed=self.class_b_encoding))
-        menu_list.add(JMenuItem("Class A Encoding", actionPerformed=self.class_a_encoding))
-        menu_list.add(JMenuItem("No Dots Encoding", actionPerformed=self.no_dots_encoding))
-        menu_list.add(JMenuItem("Hex Encoding", actionPerformed=self.hex_encoding))
-        menu_list.add(JMenuItem("Hex w/o dots", actionPerformed=self.hex_no_dots_encoding))
-        menu_list.add(JMenuItem("Hex Encoding v1", actionPerformed=self.hex_v1_encoding))
-        menu_list.add(JMenuItem("Hex Encoding v2", actionPerformed=self.hex_v2_encoding))
-        menu_list.add(JMenuItem("Octal Encoding", actionPerformed=self.octal_encoding))
-        menu_list.add(JMenuItem("Octal with 0s Encoding", actionPerformed=self.octal_with_zeros_encoding))
-        menu_list.add(JMenuItem("Mixed Encoding", actionPerformed=self.mixed_encoding))
-
+        menu_list.add(JMenuItem("Unicode Encoding", actionPerformed=lambda _: self.encode_ip()))
+        menu_list.add(JMenuItem("Class B Encoding", actionPerformed=lambda _: self.class_b_encoding()))
+        menu_list.add(JMenuItem("Class A Encoding", actionPerformed=lambda _: self.class_a_encoding()))
+        menu_list.add(JMenuItem("No Dots Encoding", actionPerformed=lambda _: self.no_dots_encoding()))
+        menu_list.add(JMenuItem("Hex Encoding", actionPerformed=lambda _: self.hex_encoding()))
+        menu_list.add(JMenuItem("Hex w/o dots", actionPerformed=lambda _: self.hex_no_dots_encoding()))
+        menu_list.add(JMenuItem("Hex Encoding v1", actionPerformed=lambda _: self.hex_v1_encoding()))
+        menu_list.add(JMenuItem("Hex Encoding v2", actionPerformed=lambda _: self.hex_v2_encoding()))
+        menu_list.add(JMenuItem("Octal Encoding", actionPerformed=lambda _: self.octal_encoding()))
+        menu_list.add(JMenuItem("Octal with 0s Encoding", actionPerformed=lambda _: self.octal_with_zeros_encoding()))
+        menu_list.add(JMenuItem("Mixed Encoding", actionPerformed=lambda _: self.mixed_encoding()))
+        menu_list.add(JMenuItem("Decimal Integer Encoding", actionPerformed=lambda _: self.integer_encoding())) # Line added
         return menu_list
+
+    def integer_encoding(self):
+        http_traffic = self.context.getSelectedMessages()
+        bounds = self.context.getSelectionBounds()
+        start, end = bounds[0], bounds[1]
+
+        for traffic in http_traffic:
+            request = traffic.getRequest()
+            selectedIP = self._helpers.bytesToString(request[start:end])
+
+            try:
+                socket.inet_aton(selectedIP)
+                encodedIP = self.encode_ip_integer(selectedIP)
+                encodedBytes = self._helpers.stringToBytes(encodedIP)
+                newRequest = request[:start] + encodedBytes + request[end:]
+                traffic.setRequest(newRequest)
+            except socket.error:
+                print("Not a valid IP.")
+                pass
+
+    def encode_ip_integer(self, ip):
+        ip_parts = ip.split('.')
+        if len(ip_parts) != 4:
+            raise ValueError("Invalid IP address")
+        
+        encoded = (int(ip_parts[0]) << 24) + (int(ip_parts[1]) << 16) + (int(ip_parts[2]) << 8) + int(ip_parts[3])
+        
+        return str(encoded)
 
     def mixed_encoding(self, event):
         http_traffic = self.context.getSelectedMessages()
