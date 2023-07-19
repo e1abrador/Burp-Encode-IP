@@ -34,6 +34,32 @@ When viewing the result on Cyber Chef (https://gchq.github.io/CyberChef/) and se
 
 ![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/be513038-ca00-41cb-aa8c-1a150eee0d85)
 
+## Encodes
+
+<b>Unicode Encoding:</b> This method encodes the IP address into a Unicode string.
+
+<b>Class B Encoding:</b> In this method, the IP address is divided into two parts: the first two octets are preserved as is and the last two are combined into a single value.
+
+<b>Class A Encoding:</b> This method preserves the first octet as is and combines the remaining three octets into a single value.
+
+<b>No Dots Encoding:</b> This method treats the entire IP address as a single integer value.
+
+<b>Hex Encoding:</b> The octets of the IP address are converted to hexadecimal values.
+
+<b>Hex w/o dots:</b> This method converts the IP address to a single hexadecimal value without dots.
+
+<b>Hex Encoding v1:</b> This method converts the first octet to hex and combines the remaining three octets into a single hexadecimal value.
+
+<b>Hex Encoding v2:</b> This method converts the first two octets to individual hexadecimal values, and the last two octets are combined into a single hexadecimal value.
+
+<b>Octal Encoding:</b> The octets of the IP address are converted to octal values.
+
+<b>Octal with 0s Encoding:</b> This method converts each octet into a zero-padded octal value.
+
+<b>Mixed Encoding:</b> This method applies a mix of encodings to different parts of the IP address.
+
+<b>Decimal Integer Encoding:</b> This method treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.
+
 Good luck and good hunting!
 If you really love the tool (or any others), or they helped you find an awesome bounty, consider [BUYING ME A COFFEE!](https://www.buymeacoffee.com/e1abrador) ☕ (I could use the caffeine!)
 
