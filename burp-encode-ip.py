@@ -22,6 +22,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
         self.context = invocation
         menu_list = ArrayList()
         menu_list.add(JMenuItem("Unicode Encoding", actionPerformed=self.encode_ip))
+        menu_list.add(JMenuItem("IPv4 on IPv6 Encoding (Unicode)", actionPerformed=self.apply_unicode_encoding))
         menu_list.add(JMenuItem("Class B Encoding", actionPerformed=self.class_b_encoding))
         menu_list.add(JMenuItem("Class A Encoding", actionPerformed=self.class_a_encoding))
         menu_list.add(JMenuItem("No Dots Encoding", actionPerformed=self.no_dots_encoding))
@@ -33,8 +34,53 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
         menu_list.add(JMenuItem("Octal with 0s Encoding", actionPerformed=self.octal_with_zeros_encoding))
         menu_list.add(JMenuItem("Mixed Encoding", actionPerformed=self.mixed_encoding)) 
         menu_list.add(JMenuItem("Decimal Integer Encoding", actionPerformed=lambda _: self.integer_encoding()))
-
         return menu_list
+
+    def apply_unicode_encoding(self, event):
+        http_traffic = self.context.getSelectedMessages()
+        bounds = self.context.getSelectionBounds()
+        start, end = bounds[0], bounds[1]
+
+        for traffic in http_traffic:
+            request = traffic.getRequest()
+            selectedIP = self._helpers.bytesToString(request[start:end])
+
+            try:
+                socket.inet_aton(selectedIP)
+                encodedIP = self.transform_ip_to_unicode(selectedIP)
+                encodedIP = self.convert_unicode_to_urlencoding(encodedIP)
+                encodedBytes = self._helpers.stringToBytes(encodedIP)
+                newRequest = request[:start] + encodedBytes + request[end:]
+                traffic.setRequest(newRequest)
+            except socket.error:
+                print("Not a valid IP.")
+                pass
+
+    def transform_ip_to_unicode(self, ip):
+        unicode_nums = ['⓿', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨']
+        ip_parts = ip.split('.')
+
+        if len(ip_parts) != 4:
+            raise ValueError("Invalid IP address")
+
+        encoded = "[::ⓕⓕⓕⓕ:"
+        for part in ip_parts:
+            for digit in part:
+                encoded += unicode_nums[int(digit)]
+            encoded += "。"
+        encoded = encoded.rstrip("。") + "]:80"  # remove the last dot and append ]:80
+
+        return encoded
+
+    def convert_unicode_to_urlencoding(self, s):
+        res = ""
+        for char in s:
+            if ord(char) > 127:
+                res += "%" + format(ord(char), 'x').zfill(2)
+            else:
+                res += char
+        return res
+
 
     def integer_encoding(self):
         http_traffic = self.context.getSelectedMessages()
@@ -91,7 +137,6 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
         encoded = ip_parts[0] + '.0x%x.' % int(ip_parts[1]) + '%012o.' % int(ip_parts[2]) + '0x%x' % int(ip_parts[3])
         
         return encoded
-
 
     def octal_with_zeros_encoding(self, event):
         http_traffic = self.context.getSelectedMessages()
