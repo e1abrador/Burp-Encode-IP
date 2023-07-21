@@ -10,57 +10,61 @@ This technique is focused on testing how the server normalizes Unicode character
 
 Go to the Extensions <b>-></b> Installed <b>-></b> Add <b>-></b> burp-encode-ip.py
 
+In order to use Unicode characters please follow the steps in the video:
+
+[change_burp_font.webm](https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/6cc9b169-766f-4693-aab3-9bb4977f1e60)
+
 ## Using
 
-Let's say we have the following request:
+[Demo.webm](https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/a97b1425-518c-4515-944a-743aea6d9745)
 
-![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/8a3a958b-0e3e-4eee-8bcb-05db0ffcea78)
-
-If we would need to face a WAF or a web app blacklist, we could use this extension to bypass those filters and test the vulnerability we are looking for.
-
-First, select the IP address you want to encode:
-
-![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/caa4da8c-89a1-4d39-a0e8-db1c5ee91651)
-
-Then right click <b>-></b> Extensions <b>-></b> \<choose any encoding\>
-
-![image](https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/04b052e1-15b9-4876-9830-0ccc45eaa457)
-
-This would be the result:
-
-![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/e846a157-70f8-4e6a-a909-74ea60ccccd5)
-
-When viewing the result on Cyber Chef (https://gchq.github.io/CyberChef/) and selecting Magic on the left bar, it is possible to see that the result is ①⑨②。①⑥⑧。①。①①	, which is the Unicode version of the selected IP address:
-
-![image](https://github.com/e1abrador/Burp-Unicode-IP/assets/74373745/be513038-ca00-41cb-aa8c-1a150eee0d85)
 
 ## Encodes
 
-<b>Unicode Encoding:</b> This method encodes the IP address into a Unicode string.
+<b><i>Unicode Encoding (Url Encoded)</i></b> -> Will convert an IP address <b>First</b> to Unicode format and then to <b>URL Encode</b>.
 
-<b>IPv4 on IPv6 Encoding</b>
+<b><i>Unicode Encoding (Copy to Clipboard)</i></b> -> Wil convert the IP address to its Unicode version. Could you paste it on the same action? I did not find any way on Burp Suite to paste Unicode from the script, therefore I added a popup window that will let the user copy the characters on the clipboard and then paste it directly to Burp Suite.
 
-<b>Class B Encoding:</b> In this method, the IP address is divided into two parts: the first two octets are preserved as is and the last two are combined into a single value.
+<b><i>IPv4 on IPv6 Unicode Encoding (URL Encoded)</i></b> -> Will convert an IP address to the following format (URL Encoded): ``[::ⓕⓕⓕⓕ:unicoded-ip-address-here]:80``. This can be useful to bypass some filters / WAF rules. [Twitter PoC](https://twitter.com/HusseiN98D/status/1681347329243201553)
 
-<b>Class A Encoding:</b> This method preserves the first octet as is and combines the remaining three octets into a single value.
+<b></i>IPv4 on IPv6 Unicode Encoding (Copy to Clipboard)</i></b> -> As well as ``Unicode Encoding (Copy to Clipboard)`` i did not find a way to paste Unicode special characters on Burp Suite (Repeater and Proxy) so when clicking this option the user will see a popup window to copy and paste the generated payload.
 
-<b>No Dots Encoding:</b> This method treats the entire IP address as a single integer value.
+<b><i>Class B Encoding</i></b> -> Will convert the IP address in two parts: the first two octets are preserved as is and the last two are combined into a single value.
 
-<b>Hex Encoding:</b> The octets of the IP address are converted to hexadecimal values.
+<b><i>Class A Encoding</i></b> -> Will preserve the first octet as is and will combine the remaining three octets into a single value.
 
-<b>Hex w/o dots:</b> This method converts the IP address to a single hexadecimal value without dots.
+<b><i>Hex Encoding</i></b> -> Will convert the octets of the IP address to hexadecimal values.
 
-<b>Hex Encoding v1:</b> This method converts the first octet to hex and combines the remaining three octets into a single hexadecimal value.
+<b><i>Hex w/o dots</i></b> -> Will convert the IP address to a single hexadecimal value without dots.
 
-<b>Hex Encoding v2:</b> This method converts the first two octets to individual hexadecimal values, and the last two octets are combined into a single hexadecimal value.
+<b><i>Hex Encoding v1</i></b> -> Will convert the first octet to hex and combine the remaining three octets into a single hexadecimal value.
 
-<b>Octal Encoding:</b> The octets of the IP address are converted to octal values.
+<b><i>Hex Encoding v2</i></b> -> Will convert the first two octets to individual hexadecimal values, and the last two octets are combined into a single hexadecimal value.
 
-<b>Octal with 0s Encoding:</b> This method converts each octet into a zero-padded octal value.
+<b><i>Octal Encoding</i></b> -> Will convert the octets of the IP address to octal values.
 
-<b>Mixed Encoding:</b> This method applies a mix of encodings to different parts of the IP address.
+<b><i>Octal with 0s Encoding</i></b> -> Will convert each octet into a zero-padded octal value.
 
-<b>Decimal Integer Encoding:</b> This method treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.
+<b><i>Mixed Encoding</i></b> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.
+
+<b><i>All</i></b> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Good luck and good hunting!
 If you really love the tool (or any others), or they helped you find an awesome bounty, consider [BUYING ME A COFFEE!](https://www.buymeacoffee.com/e1abrador) ☕ (I could use the caffeine!)
