@@ -56,6 +56,10 @@ If you really love the tool (or any others), or they helped you find an awesome 
 
 <a href='https://www.buymeacoffee.com/e1abrador' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
+## TODO
+
+- Implement random number of octets encoding, in example: 0251.254.169.254 = 169.254.169.254.
+
 ## Advisory
 
 This Burp Suite extension should be used for authorized penetration testing and/or educational purposes only. Any misuse of this software will not be the responsibility of the author or of any other collaborator. Use it at your own networks and/or with the network owner's permission.
