@@ -13,6 +13,9 @@ import socket
 import sys
 from java.awt.datatransfer import StringSelection
 from java.awt import Toolkit
+from javax.swing import JPanel, JEditorPane
+from java.awt import BorderLayout
+from javax.swing.border import EmptyBorder
 
 class BurpExtender(IBurpExtender, IContextMenuFactory):
 
@@ -45,10 +48,67 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
         menu_list.add(JMenuItem("Octal with 0s Encoding", actionPerformed=self.octal_with_zeros_encoding))
         menu_list.add(JMenuItem("Mixed Encoding", actionPerformed=self.mixed_encoding)) 
         menu_list.add(JMenuItem("Decimal Integer Encoding", actionPerformed=lambda _: self.integer_encoding()))
-
         menu_list.add(JMenuItem("All", actionPerformed=self.encode_all))
+        menu_list.add(JMenuItem("Help", actionPerformed=self._tabHelpUI))
 
         return menu_list
+
+    def _tabHelpUI(self, event):
+        dialog = JDialog()
+        dialog.setSize(1000, 1000)  # Adjust size as necessary
+        dialog.setLayout(BorderLayout())
+        
+        panel = JPanel(BorderLayout())
+        panel.setBorder(EmptyBorder(10, 10, 10, 10))
+
+        editorPaneInfo = JEditorPane()
+        editorPaneInfo.setEditable(False)
+        editorPaneInfo.setContentType("text/html")
+
+        htmlString = "<html><body><p><b>Author:</b>\t\t\tEric Labrador Sainz</p><p><b>Github:</b>\t\t\thttps://github.com/e1abrador/Burp-Encode-IP/</p>\t\t<p><b>Issues with the extension:</b> https://github.com/e1abrador/Burp-Encode-IP/issues/new</p>\t\t<p><b>Ideas:</b> https://github.com/e1abrador/Burp-Encode-IP/pulls</p>"
+        htmlString += """
+<h1>About</h1>\n<p>This extension will encode an IP address into a bunch of less known encoding techniques.</p>\n<p>This technique is focused on testing vulnerabilities such as <b>SSRF</b> [<b><i>Server-Side Request Forgery</b></i>], <b>Open Redirect</b> or <b>RFI</b> [<b><i>Remote File Inclusion</b></i>].</p>
+<h1>Prerequisites</h1>
+<p>In order to be able to use Unicode encoding functions you need to change the default Burp Suite font to Monospaced (or any other supporting Unicode characters), if the font is not changed you won't be able to use Unicode characters on Burp.</p>
+<p></p>
+ <p><img width=\"1000\" alt=\"Change font\" src=\"https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/542e8648-91f4-4eab-a0cc-8eaa25ce5a27\"><br/><br/></p>
+<h1>Usage</h1>
+The usage of the extension is very easy, first you need to highlight an IP address:
+<p></p>
+ <p><img width=\"1000\" alt=\"Change font\" src=\"https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/8acbee56-aa62-4852-8d65-1f8205e698fb\"><br/><br/></p>
+<p></p>
+<p>Then, you must just right-click and select the encoding you want to use. On most encodings the auto substitution works properly, but i did not found any way of automating that action with Unicode characters.</p>
+<p></p>
+ <p><img width=\"1000\" alt=\"Change font\" src=\"https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/a8a486dc-ad77-45f0-a464-b4dcf20ca2ee\"><br/><br/></p>
+<p></p>
+<h1>Supported Encodes</h1>
+<p><b><i>Unicode Encoding (Url Encoded) </b></i>-> Will convert an IP address First to Unicode format and then to URL Encode.</p>
+<p><b><i>Unicode Encoding (Copy to Clipboard) </b></i>-> Wil convert the IP address to its Unicode version. Could you paste it on the same action? I did not find any way on Burp Suite to paste Unicode from the script, therefore I added a popup window that will let the user copy the characters on the clipboard and then paste it directly to Burp Suite.</p>
+<p><b><i>IPv4 on IPv6 Unicode Encoding (URL Encoded)</b></i> -> Will convert an IP address to the following format (URL Encoded): <i>[::ffff:unicoded-ip-address-here]:80</i>. This can be useful to bypass some filters / WAF rules.</p>
+<p><b><i>IPv4 on IPv6 Unicode Encoding (Copy to Clipboard)</b></i> -> As well as <b><i>Unicode Encoding (Copy to Clipboard)</i></b> i did not find a way to paste Unicode special characters on Burp Suite (Repeater and Proxy) so when clicking this option the user will see a popup window to copy and paste the generated payload.</p>
+<p><b><i>Class B Encoding</b></i> -> Will convert the IP address in two parts: the first two octets are preserved as is and the last two are combined into a single value.</p>
+<p><b><i>Class A Encoding</b></i> -> Will preserve the first octet as is and will combine the remaining three octets into a single value.</p>
+<p><b><i>Hex Encoding</b></i> -> Will convert the octets of the IP address to hexadecimal values.</p>
+<p><b><i>Hex w/o dots</b></i> -> Will convert the IP address to a single hexadecimal value without dots.</p>
+<p><b><i>Hex Encoding v1</b></i> -> Will convert the first octet to hex and combine the remaining three octets into a single hexadecimal value.</p>
+<p><b><i>Hex Encoding v2</b></i> -> Will convert the first two octets to individual hexadecimal values, and the last two octets are combined into a single hexadecimal value.</p>
+<p><b><i>Octal Encoding</b></i> -> Will convert the octets of the IP address to octal values.</p>
+<p><b><i>Octal with 0s Encoding</b></i> -> Will convert each octet into a zero-padded octal value.</p>
+<p><b><i>Mixed Encoding</b></i> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.</p>
+<p><b><i>All</b></i> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension.</p>
+<h1>Advisory</h1>
+<p>This Burp Suite extension should be used for authorized penetration testing and/or educational purposes only. <b><i>Any misuse of this software will not be the responsibility of the author or of any other collaborator.</i></b> Use it at your own networks and/or with the network owner's permission.</p>
+<p>Good luck and good hunting! If you really love the tool (or any others), or they helped you find an awesome bounty, consider BUYING ME A COFFEE! [<b><i>https://www.buymeacoffee.com/e1abrador</i></b>] (I could use the caffeine!)</p>
+"""
+        editorPaneInfo.setText(htmlString)
+
+        # Create a JScrollPane and add your JEditorPane to it
+        scrollPane = JScrollPane(editorPaneInfo)
+        panel.add(scrollPane, BorderLayout.CENTER)
+        dialog.add(panel)
+
+        dialog.setVisible(True)
+
 
     def integer_encoding(self):
         http_traffic = self.context.getSelectedMessages()
