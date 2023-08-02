@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from burp import IBurpExtender
+from burp import IBurpCollaboratorClientContext
 from burp import IContextMenuFactory
 from burp import IContextMenuInvocation
 from javax.swing import JMenuItem
 from java.util import ArrayList
 from java.net import URLEncoder
-import socket
-import sys
 from javax.swing import JMenuItem, JOptionPane, JDialog, JTextArea, JButton, JScrollPane
 from java.awt import BorderLayout
 import socket
@@ -20,6 +19,8 @@ from javax.swing.border import EmptyBorder
 class BurpExtender(IBurpExtender, IContextMenuFactory):
 
     def registerExtenderCallbacks(self, callbacks):
+        self._callbacks = callbacks
+        self._collaboratorClient = callbacks.createBurpCollaboratorClientContext()
         sys.stdout = callbacks.getStdout()  # Redirige stdout a la pestaña de alertas de Burp
         self._callbacks = callbacks
         self._helpers = callbacks.getHelpers()
@@ -48,10 +49,11 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
         menu_list.add(JMenuItem("Octal with 0s Encoding", actionPerformed=self.octal_with_zeros_encoding))
         menu_list.add(JMenuItem("Mixed Encoding", actionPerformed=self.mixed_encoding)) 
         menu_list.add(JMenuItem("Decimal Integer Encoding", actionPerformed=lambda _: self.integer_encoding()))
+        menu_list.add(JMenuItem("Insert Collaborator IPv6 payload", actionPerformed=self.domain_ipv6))
         menu_list.add(JMenuItem("All", actionPerformed=self.encode_all))
         menu_list.add(JMenuItem("Help", actionPerformed=self._tabHelpUI))
 
-        return menu_list
+        return menu_list  # Agregar esta línea
 
     def _tabHelpUI(self, event):
         dialog = JDialog()
@@ -95,6 +97,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 <p><b><i>Octal Encoding</b></i> -> Will convert the octets of the IP address to octal values.</p>
 <p><b><i>Octal with 0s Encoding</b></i> -> Will convert each octet into a zero-padded octal value.</p>
 <p><b><i>Mixed Encoding</b></i> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.</p>
+<p><b><i>Collaborator in IPv6</b></i> -> Will convert a collaborator URL (automatically obtained from Burp API) and will convert it to a IPv6 valid domain.
 <p><b><i>All</b></i> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension.</p>
 <h1>Advisory</h1>
 <p>This Burp Suite extension should be used for authorized penetration testing and/or educational purposes only. <b><i>Any misuse of this software will not be the responsibility of the author or of any other collaborator.</i></b> Use it at your own networks and/or with the network owner's permission.</p>
@@ -397,56 +400,6 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 
         return encoded
 
-    def encode_all(self, event):
-        http_traffic = self.context.getSelectedMessages()
-        bounds = self.context.getSelectionBounds()
-        start, end = bounds[0], bounds[1]
-
-        for traffic in http_traffic:
-            request = traffic.getRequest()
-            selectedIP = self._helpers.bytesToString(request[start:end])
-
-            try:
-                socket.inet_aton(selectedIP)
-
-                # Unicode encoding
-                unicode_encoded_IP = self.convert_ip_to_unicode(selectedIP)
-                # IPv4 on IPv6 encoding
-                ipv6_encoded_IP = self.transform_ip_to_unicode(selectedIP)
-                # Unicode IP (urlencoded)
-                unicode_ip_urlencoded = self.encode_ip_unicode_url(selectedIP)
-                # IPv4 on IPv6 encoding (URL)
-                ipv6_unicode_url_encoding = self.encode_ipv4_on_ipv6_url(selectedIP)
-                # Class B
-                class_b_encoding_url_x = self.encode_ip_class_b(selectedIP)
-                # Class A
-                class_a_encoding_url_x = self.encode_ip_class_a(selectedIP)
-		# Hex encoding 
-		hex_encoding_x = self.encode_ip_hex(selectedIP)
-		# Hex without dots
-		hex_without_dots = self.encode_ip_hex_no_dots(selectedIP)
-		# Hex v1
-		hex_v1_enc = self.encode_ip_hex_v1(selectedIP)
-		# hex v2
-		hex_v2_enc = self.encode_ip_hex_v2(selectedIP)
-		# octal
-		octal_enc = self.encode_ip_octal(selectedIP)
-		# octal with 0s
-		octal_w_0 = self.encode_ip_octal_with_zeros(selectedIP)
-		# mixed encoding
-		mixed_enc = self.encode_ip_mixed(selectedIP)
-		# Decimal intiger
-		decimal_intiger = self.encode_ip_integer(selectedIP)
-		
-                # Show all encodings in popup
-                all_encodings = u"Unicode Encoding (URL Encoded): {}\nUnicode Encoding: {}\nIPv4 on IPv6 Encoding: {}\nIPv4 on IPv6 Encoding (URL Encoded): {}\nClass B Encoding: {}\nClass A Encoding: {}\nHex Encoding: {}\nHex w/o dots: {}\nHex Encoding v1: {}\nHex Encoding v2: {}\nOctal Encode: {}\nMixed Encoding: {}\nDecimal Intiger Encoding: {}".format(
-                    unicode_ip_urlencoded, unicode_encoded_IP, ipv6_encoded_IP, ipv6_unicode_url_encoding, class_b_encoding_url_x, class_a_encoding_url_x, hex_encoding_x, hex_without_dots, hex_v1_enc, hex_v2_enc, octal_enc, mixed_enc, decimal_intiger)
-
-                self.show_popup_dialog("All Encodings - {}".format(selectedIP), all_encodings)
-            except socket.error:
-                print("Not a valid IP.")
-                pass
-
     def encode_ip_unicode(self, event):
         http_traffic = self.context.getSelectedMessages()
         bounds = self.context.getSelectionBounds()
@@ -637,3 +590,104 @@ The usage of the extension is very easy, first you need to highlight an IP addre
         last_three = int(ip_parts[1]) * 65536 + int(ip_parts[2]) * 256 + int(ip_parts[3])
         
         return first_one + '.' + str(last_three)
+
+    @staticmethod
+    def convert_ipv4_to_ipv6(ipv4):
+        ipv4_parts = ipv4.split('.')
+        ipv6_parts = []
+
+        # Agrupar los octetos en pares y convertirlos a hexadecimal
+        for i in range(0, len(ipv4_parts), 2):
+            hex_part = hex(int(ipv4_parts[i]) << 8 | int(ipv4_parts[i + 1]))[2:]
+            ipv6_parts.append(hex_part)
+
+        # Unir los pares convertidos y añadir el prefijo IPv4-mapped
+        return "::ffff:" + ':'.join(ipv6_parts)
+
+    def domain_ipv6(self, event):
+        # Generar una URL de colaborador
+        collaboratorPayload = self._collaboratorClient.generatePayload(True)
+        print("Collaborator payload:", collaboratorPayload)
+
+        path_string = collaboratorPayload.split('.')[0]
+
+        # Aquí tienes el dominio generado por Burp Collaborator
+        domain_to_query = collaboratorPayload
+
+        # Obtiene el tráfico HTTP seleccionado
+        http_traffic = self.context.getSelectedMessages()
+        bounds = self.context.getSelectionBounds()
+        start, end = bounds[0], bounds[1]
+
+        for traffic in http_traffic:
+            request = traffic.getRequest()
+            specific_part = self._helpers.bytesToString(request[start:end])
+
+            ipv4_addresses = self.get_ipv4_from_domain(domain_to_query)
+            unique_ipv4 = set(ipv4_addresses)
+
+            for ipv4 in unique_ipv4:
+                ipv6 = self.convert_ipv4_to_ipv6(ipv4)
+                url = "http://[{0}]/{1}".format(ipv6, path_string)
+                url_bytes = self._helpers.stringToBytes(url)
+                newRequest = request[:start] + url_bytes + request[end:]
+                traffic.setRequest(newRequest)
+
+    def get_ipv4_from_domain(self, domain_name):
+        try:
+            ipv4_addresses = [ip[4][0] for ip in socket.getaddrinfo(domain_name, None, family=socket.AF_INET)]
+            return ipv4_addresses
+        except Exception as e:
+            print("An error occurred: " + str(e))
+
+            return []
+
+    def encode_all(self, event):
+        http_traffic = self.context.getSelectedMessages()
+        bounds = self.context.getSelectionBounds()
+        start, end = bounds[0], bounds[1]
+
+        for traffic in http_traffic:
+            request = traffic.getRequest()
+            selectedIP = self._helpers.bytesToString(request[start:end])
+
+            try:
+                socket.inet_aton(selectedIP)
+
+                # Unicode encoding
+                unicode_encoded_IP = self.convert_ip_to_unicode(selectedIP)
+                # IPv4 on IPv6 encoding
+                ipv6_encoded_IP = self.transform_ip_to_unicode(selectedIP)
+                # Unicode IP (urlencoded)
+                unicode_ip_urlencoded = self.encode_ip_unicode_url(selectedIP)
+                # IPv4 on IPv6 encoding (URL)
+                ipv6_unicode_url_encoding = self.encode_ipv4_on_ipv6_url(selectedIP)
+                # Class B
+                class_b_encoding_url_x = self.encode_ip_class_b(selectedIP)
+                # Class A
+                class_a_encoding_url_x = self.encode_ip_class_a(selectedIP)
+		# Hex encoding 
+		hex_encoding_x = self.encode_ip_hex(selectedIP)
+		# Hex without dots
+		hex_without_dots = self.encode_ip_hex_no_dots(selectedIP)
+		# Hex v1
+		hex_v1_enc = self.encode_ip_hex_v1(selectedIP)
+		# hex v2
+		hex_v2_enc = self.encode_ip_hex_v2(selectedIP)
+		# octal
+		octal_enc = self.encode_ip_octal(selectedIP)
+		# octal with 0s
+		octal_w_0 = self.encode_ip_octal_with_zeros(selectedIP)
+		# mixed encoding
+		mixed_enc = self.encode_ip_mixed(selectedIP)
+		# Decimal intiger
+		decimal_intiger = self.encode_ip_integer(selectedIP)
+		
+                # Show all encodings in popup
+                all_encodings = u"Unicode Encoding (URL Encoded): {}\nUnicode Encoding: {}\nIPv4 on IPv6 Encoding: {}\nIPv4 on IPv6 Encoding (URL Encoded): {}\nClass B Encoding: {}\nClass A Encoding: {}\nHex Encoding: {}\nHex w/o dots: {}\nHex Encoding v1: {}\nHex Encoding v2: {}\nOctal Encode: {}\nMixed Encoding: {}\nDecimal Intiger Encoding: {}".format(
+                    unicode_ip_urlencoded, unicode_encoded_IP, ipv6_encoded_IP, ipv6_unicode_url_encoding, class_b_encoding_url_x, class_a_encoding_url_x, hex_encoding_x, hex_without_dots, hex_v1_enc, hex_v2_enc, octal_enc, mixed_enc, decimal_intiger)
+
+                self.show_popup_dialog("All Encodings - {}".format(selectedIP), all_encodings)
+            except socket.error:
+                print("Not a valid IP.")
+                pass
