@@ -47,6 +47,8 @@ In order to use Unicode characters please follow the steps in the video:
 
 <b><i>Mixed Encoding</i></b> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.
 
+<b><i>Collaborator in IPv6</b></i> -> Will convert a collaborator URL (automatically obtained from Burp API) and will convert it to a IPv6 valid domain.
+
 <b><i>All</i></b> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension. 
 
 Good luck and good hunting!
