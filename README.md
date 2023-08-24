@@ -61,6 +61,7 @@ If you really love the tool (or any others), or they helped you find an awesome 
 ## TODO
 
 - Implement random number of octets encoding, in example: 0251.254.169.254 = 169.254.169.254.
+- Implement DNS rebind technique.
 
 ## Advisory
 
