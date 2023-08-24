@@ -45,9 +45,11 @@ In order to use Unicode characters please follow the steps in the video:
 
 <b><i>Octal with 0s Encoding</i></b> -> Will convert each octet into a zero-padded octal value.
 
-<b><i>Mixed Encoding</i></b> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.
+<b><i>Mixed Encoding</i></b> -> Will treat the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.
 
-<b><i>Collaborator in IPv6</b></i> -> Will convert a collaborator URL (automatically obtained from Burp API) and will convert it to a IPv6 valid domain.
+<b><i>Collaborator in IPv6</b></i> -> Will use a collaborator URL (automatically obtained from Burp API) and will convert it to an IPv6 valid domain.
+
+<b><i>DNS Rebinding</b></i> -> Will generate a dns rebinding domain (thanks to https://twitter.com/taviso). In any case, there's the possibility of adding a custom domain (Note that in order for this to work, this https://github.com/taviso/rbndr must be configured first).
 
 <b><i>All</i></b> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension. 
 
@@ -61,7 +63,6 @@ If you really love the tool (or any others), or they helped you find an awesome 
 ## TODO
 
 - Implement random number of octets encoding, in example: 0251.254.169.254 = 169.254.169.254.
-- Implement DNS rebind technique.
 
 ## Advisory
 
