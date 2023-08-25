@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from burp import IBurpExtender
+from javax.swing import BoxLayout
 from burp import IBurpCollaboratorClientContext
 from burp import IContextMenuFactory
 from burp import IContextMenuInvocation
@@ -10,9 +11,13 @@ from javax.swing import JMenuItem, JOptionPane, JDialog, JTextArea, JButton, JSc
 from java.awt import BorderLayout
 import socket
 import sys
+from javax.swing import JLabel
+import re
+from javax.swing import JTextField
 from java.awt.datatransfer import StringSelection
 from java.awt import Toolkit
 from javax.swing import JPanel, JEditorPane
+from javax.swing import Box
 from java.awt import BorderLayout
 from javax.swing.border import EmptyBorder
 
@@ -50,6 +55,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
         menu_list.add(JMenuItem("Mixed Encoding", actionPerformed=self.mixed_encoding)) 
         menu_list.add(JMenuItem("Decimal Integer Encoding", actionPerformed=lambda _: self.integer_encoding()))
         menu_list.add(JMenuItem("Insert Collaborator IPv6 payload", actionPerformed=self.domain_ipv6))
+        menu_list.add(JMenuItem("Insert DNS Rebinding payload", actionPerformed=lambda _: self.insert_dns_rebinding_payload()))
         menu_list.add(JMenuItem("All", actionPerformed=self.encode_all))
         menu_list.add(JMenuItem("Help", actionPerformed=self._tabHelpUI))
 
@@ -98,6 +104,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 <p><b><i>Octal with 0s Encoding</b></i> -> Will convert each octet into a zero-padded octal value.</p>
 <p><b><i>Mixed Encoding</b></i> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.</p>
 <p><b><i>Collaborator in IPv6</b></i> -> Will convert a collaborator URL (automatically obtained from Burp API) and will convert it to a IPv6 valid domain.
+<p><b><i>DNS Rebinding</b></i> -> Will generate a working dns rebinding domain (thanks to https://twitter.com/taviso). In any case, there's the possibility of adding a custom domain (Note that in order for this to work, this https://github.com/taviso/rbndr must be configured first).
 <p><b><i>All</b></i> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension.</p>
 <h1>Advisory</h1>
 <p>This Burp Suite extension should be used for authorized penetration testing and/or educational purposes only. <b><i>Any misuse of this software will not be the responsibility of the author or of any other collaborator.</i></b> Use it at your own networks and/or with the network owner's permission.</p>
@@ -111,6 +118,68 @@ The usage of the extension is very easy, first you need to highlight an IP addre
         dialog.add(panel)
 
         dialog.setVisible(True)
+
+    def insert_dns_rebinding_payload(self):
+        # Create a popup with three fields: two for IP addresses and one for domain
+        panel = JPanel()
+        panel.setLayout(BoxLayout(panel, BoxLayout.Y_AXIS))
+
+        label1 = JLabel("Enter IP Address 1:")
+        ipField1 = JTextField(15)
+    
+        label2 = JLabel("Enter IP Address 2:")
+        ipField2 = JTextField(15)
+    
+        label3 = JLabel("Enter Domain (optional, default rbndr.us):")
+        domainField = JTextField(15)
+
+        panel.add(label1)
+        panel.add(ipField1)
+        panel.add(Box.createVerticalStrut(10))
+    
+        panel.add(label2)
+        panel.add(ipField2)
+        panel.add(Box.createVerticalStrut(10))
+    
+        panel.add(label3)
+        panel.add(domainField)
+    
+        panel.setBorder(EmptyBorder(10,10,10,10))
+
+        result = JOptionPane.showConfirmDialog(None, panel, "Insert DNS Rebinding payload", JOptionPane.OK_CANCEL_OPTION)
+
+        if result == JOptionPane.OK_OPTION:
+            ip1 = ipField1.getText()
+            ip2 = ipField2.getText()
+
+            # If the domain field is empty, use 'rbndr.us'. Otherwise, use the domain provided by the user.
+            custom_domain = domainField.getText() or "rbndr.us"
+
+            if self.valid_ip(ip1) and self.valid_ip(ip2):
+                domain = self.convert_dotted_quad(ip1) + "." + self.convert_dotted_quad(ip2) + "." + custom_domain
+                self.insert_into_request(domain)
+            else:
+                print("<invalid>")
+
+    def valid_ip(self, addr):
+        pattern = re.compile(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+        return pattern.match(addr) is not None
+
+    def convert_dotted_quad(self, addr):
+        ip_parts = addr.split('.')
+        hex_parts = [format(int(part), '02x') for part in ip_parts]
+        return ''.join(hex_parts)
+
+    def insert_into_request(self, domain):
+        http_traffic = self.context.getSelectedMessages()
+        for traffic in http_traffic:
+            request = traffic.getRequest()
+            selectedData = self._helpers.bytesToString(request)
+        
+            # Simplemente añadir el dominio al final de la petición
+            modifiedData = selectedData + domain
+        
+            traffic.setRequest(self._helpers.stringToBytes(modifiedData))
 
 
     def integer_encoding(self):
@@ -438,7 +507,9 @@ The usage of the extension is very easy, first you need to highlight an IP addre
         scroll_pane = JScrollPane(text_area)
 
         copy_button = JButton("Copy")
-        copy_button.addActionListener(lambda event: self.copy_to_clipboard(message))
+        #copy_button.addActionListener(lambda event: self.copy_to_clipboard(message))
+        copy_button.addActionListener(lambda event: self.copy_to_clipboard())
+
 
         dialog.add(scroll_pane, BorderLayout.CENTER)
         dialog.add(copy_button, BorderLayout.PAGE_END)
@@ -447,10 +518,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
         dialog.setLocationRelativeTo(None)
         dialog.setVisible(True)
 
-    def copy_to_clipboard(self, text):
-        selection = StringSelection(text)
+
+    def copy_to_clipboard(self):
+        text_to_copy = "\n".join(self.encodings_to_copy)
+        selection = StringSelection(text_to_copy)
         clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
         clipboard.setContents(selection, None)
+
 
     def encode_ip(self, event):
         http_traffic = self.context.getSelectedMessages()
@@ -642,6 +716,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 
             return []
 
+
     def encode_all(self, event):
         http_traffic = self.context.getSelectedMessages()
         bounds = self.context.getSelectionBounds()
@@ -653,7 +728,6 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 
             try:
                 socket.inet_aton(selectedIP)
-
                 # Unicode encoding
                 unicode_encoded_IP = self.convert_ip_to_unicode(selectedIP)
                 # IPv4 on IPv6 encoding
@@ -682,12 +756,17 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 		mixed_enc = self.encode_ip_mixed(selectedIP)
 		# Decimal intiger
 		decimal_intiger = self.encode_ip_integer(selectedIP)
-		
-                # Show all encodings in popup
-                all_encodings = u"Unicode Encoding (URL Encoded): {}\nUnicode Encoding: {}\nIPv4 on IPv6 Encoding: {}\nIPv4 on IPv6 Encoding (URL Encoded): {}\nClass B Encoding: {}\nClass A Encoding: {}\nHex Encoding: {}\nHex w/o dots: {}\nHex Encoding v1: {}\nHex Encoding v2: {}\nOctal Encode: {}\nMixed Encoding: {}\nDecimal Intiger Encoding: {}".format(
-                    unicode_ip_urlencoded, unicode_encoded_IP, ipv6_encoded_IP, ipv6_unicode_url_encoding, class_b_encoding_url_x, class_a_encoding_url_x, hex_encoding_x, hex_without_dots, hex_v1_enc, hex_v2_enc, octal_enc, mixed_enc, decimal_intiger)
 
-                self.show_popup_dialog("All Encodings - {}".format(selectedIP), all_encodings)
+                # Guardar los encodings en una lista
+                self.encodings_to_copy = [unicode_ip_urlencoded, unicode_encoded_IP, ipv6_encoded_IP, ipv6_unicode_url_encoding, class_b_encoding_url_x, class_a_encoding_url_x, hex_encoding_x, hex_without_dots, hex_v1_enc, hex_v2_enc, octal_enc, octal_w_0, mixed_enc, decimal_intiger]
+
+                # Generar el texto final para mostrar
+                final_text_to_display = u"Unicode Encoding (URL Encoded): {}\nUnicode Encoding: {}\nIPv4 on IPv6 Encoding: {}\nIPv4 on IPv6 Encoding (URL Encoded): {}\nClass B Encoding: {}\nClass A Encoding: {}\nHex Encoding: {}\nHex w/o dots: {}\nHex Encoding v1: {}\nHex Encoding v2: {}\nOctal Encode: {}\nOctal Encode with 0s: {}\nMixed Encoding: {}\nDecimal Intiger Encoding: {}".format(
+                    *self.encodings_to_copy)
+
+                # Mostrar
+                self.show_popup_dialog("All Encodings - {}".format(selectedIP), final_text_to_display)
+
             except socket.error:
                 print("Not a valid IP.")
                 pass
