@@ -104,7 +104,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
 <p><b><i>Octal with 0s Encoding</b></i> -> Will convert each octet into a zero-padded octal value.</p>
 <p><b><i>Mixed Encoding</b></i> -> Will treats the entire IP address as a single integer value. Each octet of the IP address is interpreted as a byte, and these bytes are combined to form a single integer.</p>
 <p><b><i>Collaborator in IPv6</b></i> -> Will convert a collaborator URL (automatically obtained from Burp API) and will convert it to a IPv6 valid domain.
-<p><b><i>DNS Rebinding</b></i> -> Will generate a working dns rebinding domain (thanks to https://twitter.com/taviso). In any case, there's the possibility of adding a custom domain (Note that in order for this to work, this https://github.com/taviso/rbndr must be configured first).
+<p><b><i>DNS Rebinding</b></i> -> Will generate a domain configured with the DNS Rebinding technique (thanks to https://twitter.com/taviso). In any case, there's the possibility of adding a custom domain (Note that in order for this to work, this https://github.com/taviso/rbndr must be configured first).
 <p><b><i>All</b></i> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension.</p>
 <h1>Advisory</h1>
 <p>This Burp Suite extension should be used for authorized penetration testing and/or educational purposes only. <b><i>Any misuse of this software will not be the responsibility of the author or of any other collaborator.</i></b> Use it at your own networks and/or with the network owner's permission.</p>
