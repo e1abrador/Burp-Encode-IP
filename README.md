@@ -49,7 +49,7 @@ In order to use Unicode characters please follow the steps in the video:
 
 <b><i>Collaborator in IPv6</b></i> -> Will use a collaborator URL (automatically obtained from Burp API) and will convert it to an IPv6 valid domain.
 
-<b><i>DNS Rebinding</b></i> -> Will generate a dns rebinding domain (thanks to https://twitter.com/taviso). In any case, there's the possibility of adding a custom domain (Note that in order for this to work, this https://github.com/taviso/rbndr must be configured first).
+<b><i>DNS Rebinding</b></i> -> Will generate a domain configured with the DNS Rebinding technique (thanks to https://twitter.com/taviso). In any case, there's the possibility of adding a custom domain (Note that in order for the custom domain to work, this https://github.com/taviso/rbndr must be configured first).
 
 <b><i>All</i></b> -> Will generate a popup window that will contain the IP address encoded in all configured conversions currently existing on the extension. 
 
