@@ -64,6 +64,10 @@ If you really love the tool (or any others), or they helped you find an awesome 
 
 - Implement random number of octets encoding, in example: 0251.254.169.254 = 169.254.169.254.
 
+## Changelog
+
+25/08/2025 -> Update integrating DNS Rebinding technique.
+
 ## Advisory
 
 This Burp Suite extension should be used for authorized penetration testing and/or educational purposes only. Any misuse of this software will not be the responsibility of the author or of any other collaborator. Use it at your own networks and/or with the network owner's permission.
