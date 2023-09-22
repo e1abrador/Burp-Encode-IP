@@ -198,13 +198,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_integer(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
         
         encoded = (int(ip_parts[0]) << 24) + (int(ip_parts[1]) << 16) + (int(ip_parts[2]) << 8) + int(ip_parts[3])
         
@@ -226,13 +226,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_mixed(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
         
         encoded = ip_parts[0] + '.0x%x.' % int(ip_parts[1]) + '%012o.' % int(ip_parts[2]) + '0x%x' % int(ip_parts[3])
         
@@ -254,13 +254,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_octal_with_zeros(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         encoded = '.'.join('%012o' % int(part) for part in ip_parts)
         return encoded
@@ -281,13 +281,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_octal_with_zeros(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         encoded = '.'.join('%012o' % int(part) for part in ip_parts)
         return encoded
@@ -308,13 +308,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_octal(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         encoded = '.'.join('0%o' % int(part) for part in ip_parts)
         return encoded
@@ -335,13 +335,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_hex_v2(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         # Hex Encoding v2: convert the first two parts individually to hex, 
         # then convert the last two parts combined to hex
@@ -365,13 +365,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_hex_v1(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         # Hex Encoding v1: take the first part of IP separately and rest combined
         encoded = '0x%x.' % int(ip_parts[0]) + '0x' + ''.join('%02x' % int(part) for part in ip_parts[1:])
@@ -394,13 +394,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_hex_no_dots(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
         
         # Codificación hexadecimal sin puntos
         encoded = ''.join('%02x' % int(part) for part in ip_parts)
@@ -423,13 +423,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_hex(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
         encoded = '.'.join('0x%x' % int(part) for part in ip_parts)
         return encoded
 
@@ -447,7 +447,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 encodedIP = self.transform_ip_to_unicode(selectedIP)
                 self.show_popup_dialog("IPv4 on IPv6 Encoded IP", encodedIP)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def transform_ip_to_unicode(self, ip):
@@ -455,7 +455,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
         ip_parts = ip.split('.')
 
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         encoded = u"[::ⓕⓕⓕⓕ:"
         for part in ip_parts:
@@ -483,7 +483,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 encodedIP = self.convert_ip_to_unicode(selectedIP)
                 self.show_popup_dialog("Encoded IP", encodedIP)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def convert_ip_to_unicode(self, ip):
@@ -542,7 +542,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_unicode_url(self, ip):
@@ -579,7 +579,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def transform_ip_to_unicodex(self, ip):
@@ -587,7 +587,7 @@ The usage of the extension is very easy, first you need to highlight an IP addre
         ip_parts = ip.split('.')
 
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
 
         encoded = "[::ⓕⓕⓕⓕ:"
         for part in ip_parts:
@@ -623,13 +623,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_class_b(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
         
         first_two = ".".join(ip_parts[:2])
         last_two = int(ip_parts[2]) * 256 + int(ip_parts[3])
@@ -652,13 +652,13 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 newRequest = request[:start] + encodedBytes + request[end:]
                 traffic.setRequest(newRequest)
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
 
     def encode_ip_class_a(self, ip):
         ip_parts = ip.split('.')
         if len(ip_parts) != 4:
-            raise ValueError("Invalid IP address")
+            raise ValueError("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
         
         first_one = ip_parts[0]
         last_three = int(ip_parts[1]) * 65536 + int(ip_parts[2]) * 256 + int(ip_parts[3])
@@ -768,5 +768,5 @@ The usage of the extension is very easy, first you need to highlight an IP addre
                 self.show_popup_dialog("All Encodings - {}".format(selectedIP), final_text_to_display)
 
             except socket.error:
-                print("Not a valid IP.")
+                print("Non IPv4 detected. Please select an IPv4 to perform a correct encoding. ")
                 pass
