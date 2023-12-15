@@ -6,6 +6,14 @@ This technique is focused on testing vulnerabilities such as SSRF [Server-Side R
 
 ## TL;DR
 
+### Easy Install
+
+If you have Burp Pro it is possible to install directly on BApp:
+
+![image](https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/3cb11dfd-1fba-4ec2-ad5a-242d9a2e12d5)
+
+Don't forget to rate the extension with ⭐⭐⭐⭐⭐ stars ;)
+
 ### Installation
 
 Go to the Extensions <b>-></b> Installed <b>-></b> Add <b>-></b> burp-encode-ip.py
@@ -17,7 +25,6 @@ In order to use Unicode characters please follow the steps in the video:
 ## Using
 
 [Demo.webm](https://github.com/e1abrador/Burp-Encode-IP/assets/74373745/a97b1425-518c-4515-944a-743aea6d9745)
-
 
 ## Encodes
 
