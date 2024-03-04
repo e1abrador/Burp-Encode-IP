@@ -73,7 +73,7 @@ If you really love the tool (or any others), or they helped you find an awesome 
 
 ## Changelog
 
-**25/08/2025** -> Update integrating DNS Rebinding technique.
+**25/08/2023** -> Update integrating DNS Rebinding technique.
 
 ## Advisory
 
